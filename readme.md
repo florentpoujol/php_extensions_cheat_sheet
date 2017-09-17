@@ -4,24 +4,38 @@
 
 The "native" way is to do it like in the PHP source, in C, with the Zend API to spice things up.
 
-The (partial) documentation for the Zend API (all C macros you can use to "simplify" the extension's code), about the Zend Engine internal workings and how to build an extension can be found here :
+The documentation for the Zend API (all C macros you can use to "simplify" the extension's code), about the Zend Engine internal workings and how to build an extension can be found here :
 
 - [PHP at the Core: A Hacker's Guide](http://php.net/manual/en/internals2.php) (PHP manual)
 - http://www.phpinternalsbook.com ([GitHub](https://github.com/phpinternalsbook/PHP-Internals-Book))
 
 Note that both resources are largely WIP in some areas. But if you are serious about building native extensions, you read it all.
 
-Typically a PHP extension is 10 times faster than the "same" code in PHP userland.
+Here is a breakdown of links toward the main subjects :
+
+- PHP lifecycle: [Book](http://www.phpinternalsbook.com/php7/extensions_design/php_lifecycle.html)
+- Memory Management: [PHP manual](https://secure.php.net/manual/en/internals2.memory.management.php) | Book: [here](http://www.phpinternalsbook.com/zvals/memory_management.html) and [there](http://www.phpinternalsbook.com/php7/memory_management.html)
+- Zval and working with variables: [PHP manual](https://secure.php.net/manual/en/internals2.variables.intro.php) | [Book](http://www.phpinternalsbook.com/php7/internal_types/zvals/basic_structure.html)
+- Arrays: PHP manual - [Hashtable](https://secure.php.net/manual/en/internals2.variables.tables.php) and [Arrays](https://secure.php.net/manual/en/internals2.variables.arrays.php) | [Book](http://www.phpinternalsbook.com/hashtables.html)
+- Strings: [Book](http://www.phpinternalsbook.com/php7/internal_types/strings/zend_strings.html)
+- Resources: [Book](http://www.phpinternalsbook.com/php7/internal_types/zend_resources.html)
+- Functions: [PHP manual](https://secure.php.net/manual/en/internals2.funcs.php) | [Book](http://www.phpinternalsbook.com/php7/extensions_design/php_functions.html)
+- Classes: [Book](http://www.phpinternalsbook.com/classes_objects.html)
+- Extension structure: [PHP manual](https://secure.php.net/manual/en/internals2.structure.php) | [Book - Extension skeleton](http://www.phpinternalsbook.com/php7/extensions_design/extension_skeleton.html)
+
+Typically a PHP extension is around 10 times faster than the "same" code in PHP userland.
 
 
 ## C++ and PHP-CPP
 
-PHP-CPP is a C++ library that is a nice wrapper around the Zend API. It can do everything the Zend Engine alllows to do. It is maintained by a company that used it for their own products but it's free, open-source and has a full documentation.
+PHP-CPP is a C++ library that is a nice wrapper around the Zend API. It can do everything the Zend Engine allows to do. It is maintained by a company that used it for their own products but it's free, open-source and has a full documentation.
 
 - [Documentation](http://www.php-cpp.com/documentation/)
 - [GitHub](https://github.com/CopernicaMarketingSoftware/PHP-CPP)
 
-From their documentation, we can read that a simple bubbble sort algorithm was 10 times faster when written in a PHP extension rather than in the PHP userland.
+From their documentation, we can read that a simple bubble sort algorithm was 10 times faster when written in a PHP extension rather than in the PHP userland.
+
+
 
 
 ## Zephir
@@ -89,9 +103,9 @@ let {name} = 10.2;
 ```
 Works the same with properties, functions and classes: `this->{propName}  this->{methodName}()  {funcName}()  new {className}()`;
 
-__MOST IMPORTANTLY__
 
-You MUST precede variables with the keyword `let` to be able to change their value:
+
+__MOST IMPORTANTLY, you MUST precede variables with the keyword `let` to be able to change their value__:
 ```
 var theVar = 1; // declaration
 let theVar = 2; // assignation of another value
@@ -190,7 +204,7 @@ cd zephir
 sudo ./install
 ```
 
-Anywhere on your disk, initiate a zephir project : `zephir init extension_name`
+Anywhere on your disk, initiate a Zephir project : `zephir init extension_name`
 
 Put your `.zep` scripts in the `extension_name/extension_name` folder, following the namespace's hierarchy.
 
@@ -208,12 +222,6 @@ If you got an error about missing functions, check which PHP extension the funct
 
 If you got an error about incompatible Zend Module Api Number, the `php` command do not point toward PHP 7.0.
 
-### Performance
-
-From various personal benchmarks, an extension created with Zephir will be at least 2 times faster than the same code in the PHP userland. Which is great considering the low amount of time it takes to go from PHP to Zephir, but it's still far slower than native extensions.
-
-Two frameworks have been built with Zephir: [Phalcon](https://phalconphp.com) and [Ice](https://www.iceframework.org). From a benchmark of many PHP frameworks ([GitHub](https://github.com/kenjis/php-framework-benchmark) and [including Ice](https://www.iceframework.org/doc/introduction/benchmark)) we can see that they perform much better than Symphony or Laravel but they are still championed by some lightweight plain-PHP frameworks.
-
 ### PHP to Zephir
 
 The syntax of PHP and Zephir are close enough that you can automatically go from PHP to Zephir:
@@ -222,3 +230,9 @@ The syntax of PHP and Zephir are close enough that you can automatically go from
 - [php2zep](https://github.com/springlchy/php2zep)
 
 For both it is expected to need to pass over the generated code to make sure it is the most optimized.
+
+### Performance
+
+From various personal benchmarks, an extension created with Zephir will be at least 2 times faster than the same code in the PHP userland. Which is great considering the low amount of time it takes to go from PHP to Zephir, but it's still far slower than native extensions.
+
+Two frameworks have been built with Zephir: [Phalcon](https://phalconphp.com) and [Ice](https://www.iceframework.org). From a benchmark of many PHP frameworks ([GitHub](https://github.com/kenjis/php-framework-benchmark) and [including Ice](https://www.iceframework.org/doc/introduction/benchmark)) we can see that they perform much better than Symphony or Laravel but they are still championed by some lightweight plain-PHP frameworks.
