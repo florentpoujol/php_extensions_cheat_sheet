@@ -103,8 +103,6 @@ let {name} = 10.2;
 ```
 Works the same with properties, functions and classes: `this->{propName}  this->{methodName}()  {funcName}()  new {className}()`;
 
-
-
 __MOST IMPORTANTLY, you MUST precede variables with the keyword `let` to be able to change their value__:
 ```
 var theVar = 1; // declaration
