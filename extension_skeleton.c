@@ -1,28 +1,28 @@
 
-// define constant
-#define EXTENSIONNAME_THE_CONSTANT 1
-
-// then register it in the MINIT hook
-PHP_MINIT_FUNCTION(extensionname)
-{
-    REGISTER_LONG_CONSTANT("EXTENSIONNAME_THE_CONSTANT", EXTENSIONNAME_THE_CONSTANT, CONST_CS|CONST_PERSISTENT);
-
-    return SUCCESS;
-}
-
 
 
 // declare function body
-PHP_FUNCTION(ext_merge_sort)
+PHP_FUNCTION(extname_function_name)
 {
-    // params
-    Hashtable *left;
+    // each function (and method) have an actual argument which is zval *return_value
+    // it needs to be set to something for the function to "return" a value
+
+
+    // declare expected params
+    // see below for where the parameters are defined
+    // (the ZEND_BEGIN_ARG_INFO_EX() part)
+    Hashtable *array;
     size_t size;
 
+    // get the expected params
+    // see http://www.phpinternalsbook.com/php7/extensions_design/php_functions.html#parsing-parameters-zend-parse-parameters
+    // for full explanation
+    // the string as second argument define the expected types
     if (zend_parse_parameters(ZEND_NUM_ARGS(), "hl", &left, &size) == FAILURE) {
         return;
     }
-    // end params
+
+    // if the function does not except any parameter, you can do like in the method below
 
     return_value = *merge_sort(left, size);
 
@@ -30,34 +30,217 @@ PHP_FUNCTION(ext_merge_sort)
 
 }
 
+
+
+// method
+PHP_METHOD(ClassName, methodName) /* {{{ */
+{
+    // when the function does no expect any params
+    // use  zend_parse_parameters_none() instead of zend_parse_parameters())
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
+
+
+    zend_update_property(className_ce, obj, "propertyName", sizeof("propertyName") - 1, value_to_set TSRMLS_CC);
+    // the first arg is actually optional when the property visibility is public
+
+    zend_update_property_null(... TSRMLS_DC)
+    zend_update_property_bool(..., long value TSRMLS_DC)
+    zend_update_property_long(..., long value TSRMLS_DC)
+    zend_update_property_double(..., double value TSRMLS_DC)
+    zend_update_property_string(..., const char *value TSRMLS_DC)
+    zend_update_property_stringl(..., const char *value, int value_len TSRMLS_DC)
+    // ...  is the same as:   classEntry, obj, propertyname, sizeof propertyName
+
+    // read/write static properties
+    zend_read_static_property()
+    zend_update_static_property()
+
+
+    // this sets the return_value to the string
+    RETURN_STRING("Hello World\n", 1);
+}
+/* }}} */
+
+
+// ======================================================================
+
+
 // declare function arguments
-ZEND_BEGIN_ARG_INFO_EX(arginfo_ext_merge_sort, 0, 0, 1)
-    ZEND_ARG_ARRAY_INFO(0, "left", 0)
-    ZEND_ARG_TYPE_INFO(0, "size", "int", 0)
+// this is mostly cosmetic, but used for Reflection and the engine
+// this function expect one array then one optional int
+// see below for the method for all the macro to use with other arg type
+ZEND_BEGIN_ARG_INFO_EX(arginfo_function_name, 0, 0, 1) 
+    // last number is the number of required args
+
+    ZEND_ARG_ARRAY_INFO(0, "theArray", 0)
+    ZEND_ARG_TYPE_INFO(0, "theSize", "int", 1)
+    // pass_by_ref and allow_nulll are 0 or 1
+    // name and type_hit are string
 ZEND_END_ARG_INFO()
+
+// same things for methods
+// if you want to return a value, the beggining macro differs
+// ie this method returns a string and expect no  required argument (the content is just to show other argument macros)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_methodName, 0, "s", ClassName, 0)
+//ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_methodName, return_ref, required_num_args, type, class_name, allow_null)
+    // can we use this macro with function instead of method ? I don't know
+
+    ZEND_ARG_INFO(pass_by_ref, name) // doesn't define a particular type
+
+    ZEND_ARG_TYPE_INFO(pass_by_ref, name, type_hint, allow_null)
+    ZEND_ARG_OBJ_INFO(pass_by_ref, name, classname, allow_null)
+    ZEND_ARG_ARRAY_INFO(pass_by_ref, name, allow_null)
+    ZEND_ARG_CALLABLE_INFO(pass_by_ref, name, allow_null)
+
+    ZEND_ARG_VARIADIC_INFO(pass_by_ref, name)
+    // pass_by_ref and allow_nulll are 0 or 1
+    // name and type_hit are string
+ZEND_END_ARG_INFO()
+
+// arguments don't need to be defined per-function or per-method
+// these macros define signature so i can be reused for multiple func/methods
+// ie:
+ZEND_BEGIN_ARG_INFO_EX(arginfo_void, 0, 0, 0)
+ZEND_END_ARG_INFO()
+// the name of each signature is used below when registering 
+// functions to the extname_functions array
+// methods inside the MINIT function
+
+
+// ======================================================================
 
 
 // register functions
-static const zend_function_entry extensionnamefunctions[] =
+static const zend_function_entry extname_functions[] =
 {
-    PHP_FE(nmerge_sort, arginfo_nmerge_sort)
-    PHP_FE_END
+    // register here the functions names and their arguments
+    PHP_FE(extname_function_name, arginfo_function_name)
+    PHP_FE_END // leave that at the end
 }
 
 
+// register method for a particuler class
+const zend_function_entry className_functions[] = {
+     // non abstract method, in that case a simple public one
+    PHP_ME(ClassName, methodName, arginfo_methodName, ZEND_ACC_PUBLIC)
+
+    // for abstract method
+    PHP_ABSTRACT_ME(ClassName, abstractMethod, arginfo_abc) 
+
+    PHP_FE_END
+};
+// last param of PHP ME is a flag (can be combined):
+// ZEND_ACC_PUBLIC  ZEND_ACC_PRIVATE  ZEND_ACC_PROTECTED
+// ZEND_ACC_STATIC  ZEND_ACC_FINAL    ZEND_ACC_ABSTRACT
+// ie   ZEND_ACC_PUBLIC | ZEND_ACC_FINAL
+
+// interfaces only have abstract classes
+const zend_function_entry myInterface_functions[] = {
+    PHP_ABSTRACT_ME(MyInterface, interfaceMethod, arginfo_interfaceMethod)
+    PHP_FE_END
+};
+
+
+// ======================================================================
+
+
 // declare module
-zend_module_entry extensionnamemodule_entry = {
+zend_module_entry extnamemodule_entry = {
     STANDARD_MODULE_HEADER,
-    "extsort",
-    extensionnamefunctions,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    "extname", // anem of your extension
+    extname_functions, // register here the list of the functions created just above
+    NULL, // MINIT
+    NULL, // MSHUTDOWN
+    NULL, // RINIT
+    NULL, // RSHUTDOWN
     NULL,
     "0.0.1",
     STANDARD_MODULE_PROPERTIES
 };
+
+
+
+// define a constant
+#define EXTNAME_CONSTANT_NAME 1
+// also use
+
+
+// global variable that hodls a class
+zend_class_entry *className_ce; // respresents the scope
+zend_class_entry *customException_ce; // respresents the scope
+zend_class_entry *runtimeChildren_ce; // respresents the scope
+// interfaces also use zend_class_entry
+zend_class_entry *myInterface_ce;
+
+
+
+
+// then register it in the MINIT hook
+PHP_MINIT_FUNCTION(extname)
+{
+
+    // register constants
+    REGISTER_LONG_CONSTANT("EXTNAME_CONSTANT_NAME", EXTNAME_CONSTANT_NAME, CONST_CS|CONST_PERSISTENT);
+    // the second argument is the value, but here it is an actual contant defined with #define
+
+
+    // register classes
+    zend_class_entry tmp_ce;
+
+    INIT_CLASS_ENTRY(tmp_ce, "ClassName", className_functions);
+    // the last argument is the list of functions, it can be NULL
+    className_ce = zend_register_internal_class(&tmp_ce TSRMLS_CC); // without inheritance
+
+    // ClassName implements Countable
+    // the relevant .h must also have been included
+    zend_class_implements(
+        className_ce TSRMLS_CC, 1, spl_ce_Countable
+    );
+    // the number is the number of following argument, which are the interfaces class_entry
+
+
+    INIT_CLASS_ENTRY(tmp_ce, "CustomException", NULL); // empty Class
+    customException_ce = zend_register_internal_class_ex(
+        // inherits from Exception
+        &tmp_ce, zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC 
+    );
+
+
+    INIT_CLASS_ENTRY(tmp_ce, "RuntimeChildren", NULL); //
+    runtimeChildren_ce = zend_register_internal_class_ex(
+        // inherist from the RuntimeException
+        &tmp_ce, spl_ce_RuntimeException, NULL TSRMLS_CC
+        // the .h where the class in defined must have been included at the top of the file
+    );
+
+
+    // declare properties and default values
+    // here for the runtimeChildren_ce class
+    // zend_declare_property(class_entry, pro_name, sizeof(propName)-1, value, visibility_flag TSRMLS_CC);
+    zend_declare_property_null(runtimeChildren_ce, "foo", sizeof("foo") - 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    // other functions zend_declare_property_[type]();
+    zend_declare_property_string(runtimeChildren_ce, "bar", sizeof("bar") - 1, "the default value", ZEND_ACC_PROTECTED TSRMLS_CC);
+    // see above (in the ClassName::method) for how to get/set property within a method
+
+    // same idea for class constants
+    zend_declare_class_constant_[type](class_entry, const_name, sizeof(const_name) - 1, value TSRMLS_CC);
+
+    // register interface
+    INIT_CLASS_ENTRY(tmp_ce, "MyInterface", myInterface_functions);
+    myInterface_ce = zend_register_internal_interface(&tmp_ce TSRMLS_CC);
+
+    
+    return SUCCESS;
+}
+
+
+
+// ======================================================================
+// working with zval
+
+
 
 
 
@@ -173,7 +356,7 @@ switch (is_numeric_string(Z_STRVAL_P(zv_ptr), Z_STRLEN_P(zv_ptr), &lval, &dval, 
 // -1 "123abc" > 123 + PHP Notice
 
 
-// ===============================================
+// =======================================================================
 // SYMTABLE (array)
 // handle numerical string keys as int
 http://www.phpinternalsbook.com/hashtables/array_api.html
@@ -188,7 +371,7 @@ ZEND_INIT_SYMTABLE(ht);
 ZEND_INIT_SYMTABLE_EX(ht, size, persistent);
 
 
-// ===============================================
+// =======================================================================
 // ARRAYS
 http://www.phpinternalsbook.com/hashtables/array_api.html
 
@@ -306,14 +489,7 @@ zend_hash_index_del(hash, index); // returns success or failure
 // STRING keys
 
 
-// ------------------
-// Iteration
 
-zval **data;
 
-for (zend_hash_internal_pointer_reset(myht);
-     zend_hash_get_current_data(myht, (void **) &data) == SUCCESS;
-     zend_hash_move_forward(myht)
-) {
-    /* Do something with data */
-}
+
+

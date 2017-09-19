@@ -23,7 +23,10 @@ Here is a breakdown of links toward the main subjects :
 - Classes: [Book](http://www.phpinternalsbook.com/classes_objects.html)
 - Extension structure: [PHP manual](https://secure.php.net/manual/en/internals2.structure.php) | [Book - Extension skeleton](http://www.phpinternalsbook.com/php7/extensions_design/extension_skeleton.html)
 
+Also see the `extension_skeleton.c` file. It contains some examples of how to set-up constants, functions, classes, methods, arguments, properties, etc.. and working with Zvals.
+
 Typically a PHP extension is around 10 times faster than the "same" code in PHP userland.
+
 
 
 ## C++ and PHP-CPP
@@ -34,7 +37,6 @@ PHP-CPP is a C++ library that is a nice wrapper around the Zend API. It can do e
 - [GitHub](https://github.com/CopernicaMarketingSoftware/PHP-CPP)
 
 From their documentation, we can read that a simple bubble sort algorithm was 10 times faster when written in a PHP extension rather than in the PHP userland.
-
 
 
 
