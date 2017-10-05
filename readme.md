@@ -4,12 +4,12 @@
 
 The "native" way is to do it like in the PHP source, in C, with the Zend API to spice things up.
 
-The documentation for the Zend API (all C macros you can use to "simplify" the extension's code), about the Zend Engine internal workings and how to build an extension can be found here :
+The documentation for the Zend API (all C macros you can use to simplify the extension's code), about the Zend Engine internal workings and how to build an extension can be found mostly in these two places:
 
 - [PHP at the Core: A Hacker's Guide](http://php.net/manual/en/internals2.php) (PHP manual)
 - http://www.phpinternalsbook.com ([GitHub](https://github.com/phpinternalsbook/PHP-Internals-Book))
 
-Note that both resources are largely WIP in some areas. But if you are serious about building native extensions, you read it all.
+Note that both resources are WIP in some areas. But if you are serious about building native extensions, you read it all.
 
 Here is a breakdown of links toward the main subjects :
 
@@ -23,7 +23,7 @@ Here is a breakdown of links toward the main subjects :
 - Classes: [Book](http://www.phpinternalsbook.com/classes_objects.html)
 - Extension structure: [PHP manual](https://secure.php.net/manual/en/internals2.structure.php) | [Book - Extension skeleton](http://www.phpinternalsbook.com/php7/extensions_design/extension_skeleton.html)
 
-Also see the `extension_skeleton.c` file. It contains some examples of how to set-up constants, functions, classes, methods, arguments, properties, etc.. and working with Zvals.
+See the [`native_extension.c`](native_extension.c) file. It contains some examples of how to set-up constants, functions, classes, methods, arguments, properties, etc.. and working with Zvals.
 
 Typically a PHP extension is around 10 times faster than the "same" code in PHP userland.
 
@@ -35,6 +35,8 @@ PHP-CPP is a C++ library that is a nice wrapper around the Zend API. It can do e
 
 - [Documentation](http://www.php-cpp.com/documentation/)
 - [GitHub](https://github.com/CopernicaMarketingSoftware/PHP-CPP)
+
+See the [`phpcpp_extension.cpp`](phpcpp_extension.cpp) for a quick cheat sheet of the syntax and features.
 
 From their documentation, we can read that a simple bubble sort algorithm was 10 times faster when written in a PHP extension rather than in the PHP userland.
 
